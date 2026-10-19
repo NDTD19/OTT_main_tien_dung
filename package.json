@@ -5,15 +5,16 @@
   "type": "commonjs",
   "scripts": {
     "db:generate": "prisma generate",
-  "db:validate": "prisma validate",
-  "db:migrate": "prisma migrate dev",
-  "db:status": "prisma migrate status",
-  "db:studio": "prisma studio",
-  "db:check": "node scripts/check-db.cjs",
+    "db:validate": "prisma validate",
+    "db:migrate": "prisma migrate dev",
+    "db:status": "prisma migrate status",
+    "db:studio": "prisma studio",
+    "db:check": "node scripts/check-db.cjs",
     "start": "node server/index.js",
     "dev": "node --watch server/index.js",
     "test": "node --test tests/*.test.js",
-    "seed": "node server/seed.js"
+    "seed": "node server/seed.js",
+    "dev:pg": "node server/index-postgres.js"
   },
   "engines": {
     "node": ">=20"

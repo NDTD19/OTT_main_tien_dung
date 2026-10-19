@@ -128,3 +128,165 @@ html:not(.light) #timeline .logline span{color:#7a6349!important}
 html:not(.light) .submitted-panel .notice,html:not(.light) .submitted-panel .section-head p{color:#39291a!important}
 html:not(.light) .submitted-panel .section-head p{color:#fff8e8!important}
 @media(max-width:850px){.submission-fields{grid-template-columns:1fr}.submitted-panel .section-head{flex-wrap:wrap}}
+
+/* ==================================================
+   FIX: Account dropdown behind page content
+   ================================================== */
+
+/* Ensure top navigation sits above page content */
+.main > .topbar {
+  position: relative;
+  z-index: 30;
+  overflow: visible;
+}
+
+/* Keep menu trigger and dropdown in the upper layer */
+.topbar .topactions {
+  position: relative;
+  z-index: 1;
+}
+
+.auth-user-dropdown-wrap {
+  position: relative;
+  z-index: 2;
+  isolation: isolate;
+}
+
+/* Dropdown must be solid, visible and clickable */
+#authDropdownMenu {
+  position: absolute;
+  z-index: 100;
+  top: calc(100% + 8px);
+  right: 0;
+
+  background: #fff8e6;
+  color: #24365d;
+  border: 2px solid #8d693e;
+  border-radius: 10px;
+
+  box-shadow: 5px 6px 0 rgba(15, 32, 61, 0.35);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Make each option clearly readable */
+#authDropdownMenu .auth-dropdown-header {
+  color: #24365d;
+  border-bottom-color: #c9b48d;
+}
+
+#authDropdownMenu .auth-dropdown-item {
+  color: #24365d;
+  opacity: 1;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+/* Hover feedback */
+#authDropdownMenu .auth-dropdown-item:hover {
+  background: #e9d8b4;
+  color: #14274e;
+}
+
+/* Logout action */
+#authDropdownMenu .auth-dropdown-item.danger {
+  color: #b52e36;
+}
+
+#authDropdownMenu .auth-dropdown-item.danger:hover {
+  background: #ffe0dc;
+}
+
+/* Dark theme */
+html:not(.light) #authDropdownMenu {
+  background: #172747;
+  color: #f5f0df;
+  border-color: #6b82b5;
+}
+
+html:not(.light) #authDropdownMenu .auth-dropdown-header,
+html:not(.light) #authDropdownMenu .auth-dropdown-item {
+  color: #f5f0df;
+}
+
+html:not(.light) #authDropdownMenu .auth-dropdown-item:hover {
+  background: #304a78;
+}
+
+html:not(.light) #authDropdownMenu .auth-dropdown-item.danger {
+  color: #ff9999;
+}
+
+/* =====================================================
+   OTT ARENA - TEXT READABILITY FIX
+   Tournament, submissions and LIVE badge
+   ===================================================== */
+
+/* 1. Tournament cards: dark, clean headings */
+.tournament-card h2 {
+  color: #263650 !important;
+  text-shadow: none !important;
+  -webkit-text-stroke: 0 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.5;
+}
+
+/* 2. My submissions: yellow panel heading */
+.submission-hero h2 {
+  color: #263650 !important;
+  text-shadow: none !important;
+  -webkit-text-stroke: 0 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.5;
+}
+
+/* 3. Section headers: Submission history, etc. */
+.card .section-head h3 {
+  text-shadow: none !important;
+  -webkit-text-stroke: 0 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.5;
+}
+
+/* 4. Sidebar LIVE label: show text cleanly */
+.sidebar .nav .navtag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: 5px 7px;
+
+  background: #efff36 !important;
+  color: #173a21 !important;
+
+  font-weight: 800;
+  text-shadow: none !important;
+  -webkit-text-stroke: 0 !important;
+  letter-spacing: 0 !important;
+  line-height: 1;
+}
+
+/* 5. Remove heavy shadows from small sidebar labels */
+.sidebar .nav {
+  text-shadow: none !important;
+}
+
+/* 6. Make text on tournament cards more readable */
+.tournament-card p,
+.tournament-card .bottom {
+  text-shadow: none !important;
+}
+
+/* 7. Reduce shadow on relevant action buttons */
+.tournament-card .btn,
+.submission-hero .btn {
+  text-shadow: none !important;
+}
+
+/* 8. Keep headings legible in dark theme */
+html:not(.light) .tournament-card h2,
+html:not(.light) .submission-hero h2 {
+  color: #263650 !important;
+  text-shadow: none !important;
+}

@@ -80,6 +80,7 @@ model User {
   staffAssignments  TournamentStaff[]
   auditLogs         AuditLog[]
   resultHistories   ResultHistory[]
+  createdMatches    Match[]
 }
 
 model Session {
@@ -189,6 +190,15 @@ model Match {
   createdAt      DateTime     @default(now())
   startedAt      DateTime?
   finishedAt     DateTime?
+  legacyMetadata Json?
+
+  createdById        String?
+  maxMoves           Int?
+  pieces             Int?
+  firstPlayerSetting String?
+  autoMatch          Boolean @default(false)
+
+  creator User? @relation(fields: [createdById], references: [id])
 
   tournament Tournament? @relation(fields: [tournamentId], references: [id])
 
@@ -280,4 +290,9 @@ model AuditLog {
   actor User? @relation(fields: [actorId], references: [id])
 
   @@index([actorId, createdAt])
+}
+
+model AppSetting {
+  key   String @id
+  value Json
 }

@@ -12,3 +12,11 @@ data/*
 .env.*
 !.env.example
 prisma/*.bak
+
+# Backups
+*.bak
+*.dump
+*.tar.gz
+
+# Windows metadata
+*:Zone.Identifier

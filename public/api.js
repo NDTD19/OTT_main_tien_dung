@@ -754,6 +754,21 @@ document.addEventListener('click', (e) => {
 });
 
 // ─── Initialization & Render Patching ─────────────────────────────────────────
+// Phase 6.7: login-only interface; accounts are provisioned by organizers.
+const _phase67LoginRender = renderLoginPage;
+renderLoginPage = function() {
+  authPageMode = 'login';
+  _phase67LoginRender();
+  document.querySelector('.login-tabs')?.remove();
+  const footer = document.querySelector('.login-card > div[style*="margin-top:22px"]');
+  if (footer) footer.innerHTML = '<p class="tiny muted" style="text-align:center">Tài khoản được Ban tổ chức cung cấp.</p>';
+};
+const _phase67SwitchAuth = switchAuthMode;
+switchAuthMode = function(mode) {
+  if (mode !== 'login') return;
+  return _phase67SwitchAuth(mode);
+};
+
 function setupAuthIntegration() {
   injectAuthStyles();
 
