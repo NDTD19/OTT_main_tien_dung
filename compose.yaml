@@ -1,0 +1,27 @@
+
+services:
+  db:
+    image: postgres:17
+    container_name: ottv2-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: ott
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      POSTGRES_DB: ottv2
+
+    ports:
+      - "127.0.0.1:5433:5432"
+
+    volumes:
+      - ott_postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ott -d ottv2"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  ott_postgres_data:
+
