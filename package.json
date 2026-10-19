@@ -4,6 +4,12 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
+    "db:generate": "prisma generate",
+  "db:validate": "prisma validate",
+  "db:migrate": "prisma migrate dev",
+  "db:status": "prisma migrate status",
+  "db:studio": "prisma studio",
+  "db:check": "node scripts/check-db.cjs",
     "start": "node server/index.js",
     "dev": "node --watch server/index.js",
     "test": "node --test tests/*.test.js",
@@ -13,8 +19,14 @@
     "node": ">=20"
   },
   "dependencies": {
+    "@prisma/client": "6.19.3",
     "bcryptjs": "^3.0.3",
+    "dotenv": "18.0.8",
     "jsonwebtoken": "^9.0.3",
-    "ws": "^8.22.0"
+    "ws": "^8.22.0",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "prisma": "6.19.3"
   }
 }
