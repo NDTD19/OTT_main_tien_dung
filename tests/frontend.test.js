@@ -7,7 +7,7 @@ function makeContext(){
  const ctx={console,location:{hash:''},setTimeout,clearTimeout,setInterval,clearInterval,
   localStorage:{getItem:()=>null,setItem:()=>{}},
   window:{scrollTo:()=>{},addEventListener:()=>{}},
-  document:{documentElement:{className:''},getElementById:id=>id==='app'?app:null,querySelector:()=>null,createElement:()=>({textContent:''}),body:{append:()=>{}}},
+  document:{documentElement:{className:''},head:{appendChild:()=>{}},getElementById:id=>id==='app'?app:null,querySelector:()=>null,createElement:()=>({textContent:''}),body:{append:()=>{},appendChild:()=>{}},addEventListener:()=>{}},
   fetch:async url=>({ok:true,json:async()=>url.includes('/submissions')?[{id:'SUB-A1B2C3D4',name:'bot.c',lang:'C',date:new Date().toISOString(),status:'Stored',version:'v1'}]:url.includes('/matches')?[]:url.includes('/leaderboard')?[]:{dockerReady:false}})
  };
  vm.createContext(ctx);
@@ -21,9 +21,8 @@ test('all major frontend views render without a browser runtime error',()=>{
   vm.runInContext(`go('${page}')`,ctx);
   assert.ok(app.innerHTML.includes('OTT'));
  }
- assert.ok(app.innerHTML.includes('Submitted Bot vs Submitted Bot'));
- assert.ok(app.innerHTML.includes('id="submissionA"'));
- assert.ok(app.innerHTML.includes('id="submissionB"'));
+ assert.ok(app.innerHTML.includes('Challenge Arena'));
+ assert.ok(app.innerHTML.includes('id="challengeBot"'));
 });
 test('server data replaces mock matches with empty state and avoids fake replay',async()=>{
  const {app,ctx}=makeContext();

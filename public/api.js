@@ -320,8 +320,9 @@ let wsConn = null;
 let wsReconnectTimer = null;
 
 function connectWebSocket() {
+  if (typeof WebSocket === 'undefined') return;
   if (wsConn && wsConn.readyState < 2) return;
-  const wsUrl = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws';
+  const wsUrl = (location.protocol === 'https:' ? 'wss://' : 'ws://') + (location.host || 'localhost:3001') + '/ws';
   wsConn = new WebSocket(wsUrl);
 
   wsConn.onopen = () => {
@@ -743,17 +744,23 @@ function injectAuthStyles() {
       color: #86efac;
     }
   `;
-  document.head.appendChild(style);
+  if (document.head && typeof document.head.appendChild === 'function') {
+    document.head.appendChild(style);
+  } else if (document.body && typeof document.body.appendChild === 'function') {
+    document.body.appendChild(style);
+  }
 }
 
 // Close user menu when clicking outside
-document.addEventListener('click', (e) => {
-  const menu = document.getElementById('authDropdownMenu');
-  const btn = document.getElementById('authNavBtn');
-  if (menu && menu.style.display !== 'none' && (!btn || !btn.contains(e.target))) {
-    menu.style.display = 'none';
-  }
-});
+if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+  document.addEventListener('click', (e) => {
+    const menu = document.getElementById('authDropdownMenu');
+    const btn = document.getElementById('authNavBtn');
+    if (menu && menu.style.display !== 'none' && (!btn || !btn.contains(e.target))) {
+      menu.style.display = 'none';
+    }
+  });
+}
 
 // ─── Initialization & Render Patching ─────────────────────────────────────────
 function isUserAdmin() {
