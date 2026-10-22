@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản Lý Giải Đấu — OTT Arena</title>
+  <meta name="description" content="Hệ thống quản lý giải đấu OTT Arena - Vòng tròn & Đấu loại trực tiếp">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap">
+  <link rel="stylesheet" href="tournament.css">
+</head>
+<body>
+  <div id="app">
+    <!-- NAV -->
+    <nav class="topnav" id="topnav">
+      <div class="nav-brand">
+        <span class="brand-icon">🏆</span>
+        <span class="brand-name">OTT <span class="brand-accent">Giải Đấu</span></span>
+      </div>
+      <div class="nav-center" id="nav-tabs"></div>
+      <div class="nav-right">
+        <div id="auth-status"></div>
+        <a href="/" class="nav-back-btn">← Arena</a>
+      </div>
+    </nav>
+
+    <!-- MAIN -->
+    <main id="main" class="main"></main>
+
+    <!-- TOAST -->
+    <div id="toast-container"></div>
+
+    <!-- MODAL -->
+    <div id="modal-overlay" class="modal-overlay hidden" onclick="closeModal()">
+      <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h3 id="modal-title"></h3>
+          <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div id="modal-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="tournament.js" defer></script>
+</body>
+</html>

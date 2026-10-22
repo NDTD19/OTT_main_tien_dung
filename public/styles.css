@@ -290,3 +290,40 @@ html:not(.light) .submission-hero h2 {
   color: #263650 !important;
   text-shadow: none !important;
 }
+
+.tournament-frame{width:100%;height:calc(100vh - 190px);min-height:640px;border:0;border-radius:16px;background:transparent;display:block}
+
+/* ═══════════════════════════════════════════════════════════════
+   Native Tournament & Match Arena Live Styles
+   ═══════════════════════════════════════════════════════════════ */
+@keyframes pulse {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.97); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.square.from-sq {
+  outline: 3px dashed #ff9a4e !important;
+  outline-offset: -3px;
+}
+.square.to-sq {
+  outline: 3px solid #00b925 !important;
+  outline-offset: -3px;
+}
+
+.bracket-match {
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.bracket-match:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent, #00b925) !important;
+}
+
+.modaloverlay {
+  animation: fadeIn 0.15s ease-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+

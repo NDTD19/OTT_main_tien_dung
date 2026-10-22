@@ -10,13 +10,14 @@ const jwt = require('jsonwebtoken');
 const { runMatch } = require('./engine');
 const runner = require('./bot-runner');
 const store = require('./store');
+const { handleTournament } = require('./tournament');
 const PORT = Number(process.env.PORT || 3000);
 const HOST = process.env.HOST || '0.0.0.0';
 const PUB = path.resolve(__dirname, '../public');
 const DATA = path.resolve(__dirname, '../data');
 const MAX_BODY = 760000;
 const MAX_CONCURRENT = Math.max(2, Math.min(16, os.cpus().length));
-const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex');
+const JWT_SECRET = process.env.JWT_SECRET || 'ott-jwt-secret-key-2026-v2-secure';
 const mime = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon' };
 console.log('[Config] Parallel match slots: ' + MAX_CONCURRENT + ' (' + os.cpus().length + ' CPU cores)');
 const send = (res, status, value) => { if (res.destroyed) return; res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' }); res.end(JSON.stringify(value)); };
@@ -25,7 +26,10 @@ const db = store.get();
 if (!db.ratings) db.ratings = {};
 if (!db.users) db.users = {};
 if (!db.matches) db.matches = [];
+if (!db.tournaments) db.tournaments = [];
 for (const m of db.matches) { if (['running', 'queued'].includes(m.status)) { m.status = 'failed'; m.error = 'Server restarted during match'; } }
+// Ensure first registered user or user named 'admin' gets admin role
+if (db.users['admin'] && !db.users['admin'].role) db.users['admin'].role = 'admin';
 store.save();
 let wss = null;
 function broadcast(event, data) { if (!wss) return; const msg = JSON.stringify({ event, ...data }); for (const client of wss.clients) { if (client.readyState === 1) { try { client.send(msg); } catch { } } } }
@@ -56,9 +60,12 @@ async function route(req, res, url) {
     if (!password || password.length > 128) return send(res, 400, { error: 'Vui lòng nhập mật khẩu (tối đa 128 ký tự)' });
     if (db.users[username]) return send(res, 409, { error: 'Username đã tồn tại. Hãy đăng nhập hoặc chọn tên khác' });
     const passwordHash = await bcrypt.hash(password, 10);
-    db.users[username] = { passwordHash, createdAt: new Date().toISOString() };
+    // First user or user named 'admin' gets admin role automatically
+    const isFirstUser = Object.keys(db.users).length === 0;
+    const role = (isFirstUser || username === 'admin') ? 'admin' : 'user';
+    db.users[username] = { passwordHash, createdAt: new Date().toISOString(), role };
     store.save();
-    return send(res, 201, { token: signToken(username), username });
+    return send(res, 201, { token: signToken(username), username, role });
   }
   if (pathname === '/api/auth/login' && req.method === 'POST') {
     const b = await body(req);
@@ -69,9 +76,9 @@ async function route(req, res, url) {
     if (!user) return send(res, 401, { error: 'Username không tồn tại. Vui lòng nhấn Đăng ký!' });
     const ok = await bcrypt.compare(password, user.passwordHash);
     if (!ok) return send(res, 401, { error: 'Mật khẩu không chính xác' });
-    return send(res, 200, { token: signToken(username), username });
+    return send(res, 200, { token: signToken(username), username, role: user.role || 'user' });
   }
-  if (pathname === '/api/auth/me' && req.method === 'GET') { const payload = verifyToken(req); if (!payload) return send(res, 401, { error: 'Chua dang nhap' }); const myBots = db.submissions.filter(s => s.ownedBy === payload.sub); const myMatches = db.matches.filter(m => m.ownedBy === payload.sub).slice(0, 20); return send(res, 200, { username: payload.sub, bots: myBots, recentMatches: myMatches }); }
+  if (pathname === '/api/auth/me' && req.method === 'GET') { const payload = verifyToken(req); if (!payload) return send(res, 401, { error: 'Chua dang nhap' }); const myBots = db.submissions.filter(s => s.ownedBy === payload.sub); const myMatches = db.matches.filter(m => m.ownedBy === payload.sub).slice(0, 20); return send(res, 200, { username: payload.sub, role: (db.users[payload.sub]||{}).role || 'user', bots: myBots, recentMatches: myMatches }); }
   if (pathname === '/api/submissions' && req.method === 'GET') return send(res, 200, db.submissions);
   if (pathname === '/api/submissions' && req.method === 'POST') {
     if (!db.settings.submissionsOpen) return send(res, 403, { error: 'Submissions are closed' });
@@ -126,6 +133,11 @@ async function route(req, res, url) {
     const rec = recordMatch({ ...b, maxMoves, pieces, first, ownedBy: payload?.sub || null }); submitJob(rec); return send(res, 202, rec);
   }
   if (pathname === '/api/settings' && req.method === 'GET') return send(res, 200, db.settings);
+  // ── Tournament routes ────────────────────────────────────────────────────────
+  if (pathname.startsWith('/api/tournaments')) {
+    const result = await handleTournament(req, res, pathname, body, verifyToken, send);
+    if (result !== null) return result;
+  }
   return send(res, 404, { error: 'API route not found' });
 }
 const server = http.createServer(async (req, res) => {

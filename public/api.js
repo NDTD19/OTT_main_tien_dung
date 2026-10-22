@@ -10,11 +10,12 @@ function authHeaders() {
   return authState.token ? { 'Authorization': 'Bearer ' + authState.token } : {};
 }
 
-function saveAuth(token, username) {
+function saveAuth(token, username, role) {
   authState.token = token;
   authState.username = username;
   localStorage.setItem('ott_token', token);
   localStorage.setItem('ott_username', username);
+  localStorage.setItem('ott_role', role || 'user');
 }
 
 function clearAuth() {
@@ -22,6 +23,7 @@ function clearAuth() {
   authState.username = null;
   localStorage.removeItem('ott_token');
   localStorage.removeItem('ott_username');
+  localStorage.removeItem('ott_role');
 }
 
 const api = {
@@ -121,7 +123,7 @@ async function handleAuthSubmit(e) {
   try {
     const endpoint = authPageMode === 'register' ? '/auth/register' : '/auth/login';
     const data = await api.post(endpoint, { username, password });
-    saveAuth(data.token, data.username);
+    saveAuth(data.token, data.username, data.role);
 
     showAuthAlert(
       (authPageMode === 'register' ? 'Đăng ký thành công! ' : 'Đăng nhập thành công! ') +
@@ -754,20 +756,13 @@ document.addEventListener('click', (e) => {
 });
 
 // ─── Initialization & Render Patching ─────────────────────────────────────────
-// Phase 6.7: login-only interface; accounts are provisioned by organizers.
-const _phase67LoginRender = renderLoginPage;
-renderLoginPage = function() {
-  authPageMode = 'login';
-  _phase67LoginRender();
-  document.querySelector('.login-tabs')?.remove();
-  const footer = document.querySelector('.login-card > div[style*="margin-top:22px"]');
-  if (footer) footer.innerHTML = '<p class="tiny muted" style="text-align:center">Tài khoản được Ban tổ chức cung cấp.</p>';
-};
-const _phase67SwitchAuth = switchAuthMode;
-switchAuthMode = function(mode) {
-  if (mode !== 'login') return;
-  return _phase67SwitchAuth(mode);
-};
+function isUserAdmin() {
+  const role = localStorage.getItem('ott_role') || (authState.user && authState.user.role);
+  return role === 'admin' || authState.username === 'admin';
+}
+window.isUserAdmin = isUserAdmin;
+window.apiBridge = api;
+window.authState = authState;
 
 function setupAuthIntegration() {
   injectAuthStyles();
